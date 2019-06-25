@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Napkin ML</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Open+Sans:700, 300);
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .frame {
+        width: 400px;
+        height: 400px;
+        margin: auto;
+        margin-top: 100px;
+        border-radius: 2px;
+        box-shadow: 4px 8px 16px 0 rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: linear-gradient(to top right, darkmagenta 0%, hotpink 100%);
+        color: #333;
+        font-family: "Open Sans", Helvetica, sans-serif;
+      }
+
+      .center {
+        margin: auto;
+        margin-top: 70px;
+        width: 300px;
+        height: 260px;
+        border-radius: 3px;
+        box-shadow: 8px 10px 15px 0 rgba(0, 0, 0, 0.2);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+        flex-direction: column;
+      }
+
+      .title {
+        width: 100%;
+        height: 50px;
+        border-bottom: 1px solid #999;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 16px;
+        font-weight: 300;
+        color: #666;
+      }
+
+      .dropzone {
+        width: 100px;
+        height: 80px;
+        border: 1px dashed #999;
+        border-radius: 3px;
+        text-align: center;
+      }
+
+      #form {
+        background-position: center;
+        background-image: url("/static/upload.svg");
+        background-repeat: no-repeat;
+        height: 100%;
+        width: 100%;
+      }
+
+      .upload-icon {
+        margin: 25px 2px 2px 2px;
+      }
+
+      .upload-input {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 140px;
+        height: 40px;
+        background: darkmagenta;
+        color: #fff;
+        border-radius: 3px;
+        border: 0;
+        box-shadow: 0 3px 0 0 hotpink;
+        transition: all 0.3s ease-in-out;
+        font-size: 14px;
+      }
+
+      .btn:hover {
+        background: rebeccapurple;
+        box-shadow: 0 3px 0 0 deeppink;
+      }
+
+      pre {
+        font-weight: bold;
+        font-size: 1.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="frame">
+        <div class="center">
+          <div class="title">
+            <h1>Drop file to detect for Retinopathy</h1>
+          </div>
+
+          <div class="dropzone">
+            <form id="form">
+              <input
+                type="file"
+                id="upload"
+                class="upload-input"
+                accept="image/*"
+              />
+            </form>
+          </div>
+          <label for="upload" class="btn">Select file</label>
+        </div>
+      </div>
+      <pre id="result"></pre>
+
+      <!-- <footer class="footer">
+        <p>&copy; Napkin Inc</p>
+      </footer> -->
+    </div>
+
+    <script
+      src="//code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      $(document).ready(function() {
+        $("#upload").on("change", function(e) {
+          var data = new FormData();
+          data.append("file", e.target.files[0]);
+          $("#result").text("loading...");
+          $.ajax({
+            url: "/api/v1/detect",
+            method: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            processData: false
+          })
+            .done(function(data) {
+              $("#result").text(JSON.stringify(data, null, 2));
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+              $("#result").text(`${jqXHR.status}: ${errorThrown}`);
+              console.log(jqXHR.responseText);
+            });
+        });
+      });
+    </script>
+  </body>
+</html>

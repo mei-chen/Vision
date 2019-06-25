@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visn-www
+  labels:
+    app: visn-www
+spec:
+  replicas: 2
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: visn-www
+  template:
+    metadata:
+      labels:
+        app: visn-www
+    spec:
+      containers:
+      - name: visn-www
+        image: zihao/play:visn-www
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: visn-www
+  labels:
+    app: visn-www
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: visn-www
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: visn-www
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/issuer: "letsencrypt-prod"
+    certmanager.k8s.io/acme-challenge-type: http01
+spec:
+  tls:
+  - hosts:
+    - visn.cc
+    secretName: visn-cc-tls
+  rules:
+  - host: visn.cc
+    http:
+      paths:
+      - backend:
+          serviceName: visn-www
+          servicePort: 80
+        path: /
