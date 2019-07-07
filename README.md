@@ -11,5 +11,5 @@ FLASK_DEBUG=1 python app.py
 
 ```bash
 npm install -g http-server
-cd www && http-server
+http-server www
 ```

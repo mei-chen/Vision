@@ -1,0 +1,36 @@
+image: docker:stable
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+
+build:
+  stage: build
+  script:
+    - docker pull zihao/play:visn-app || true
+    - docker build --cache-from zihao/play:visn-app -t zihao/play:visn-app -f deploy/app.dockerfile .
+    - docker push zihao/play:visn-app
+    - docker pull zihao/play:visn-www || true
+    - docker build --cache-from zihao/play:visn-www -t zihao/play:visn-www -f deploy/www.dockerfile .
+    - docker push zihao/play:visn-www
+  only:
+    - master
+
+deploy to production:
+  stage: deploy
+  image: google/cloud-sdk
+  script:
+  - kubectl apply -f deploy/*.yaml
+  - kubectl patch deployment visn-app -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`env TZ="UTC" date +'%F_%s'`\"}}}}}";
+  - kubectl patch deployment visn-www -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`env TZ="UTC" date +'%F_%s'`\"}}}}}";
+  environment:
+    name: production
+    url: https://visn.cc
+  only:
+    - master

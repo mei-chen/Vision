@@ -2086,6 +2086,13 @@ ul {
   }
 }
 
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  /* line 11, ../../01 cl html template/New folder/May 2019/179 Medisen Medical/179 Medisen Medical -Template/sass/_menu.scss */
+  .main_menu .navbar-brand {
+    max-width: 160px;
+  }
+}
+
 /* line 23, ../../01 cl html template/New folder/May 2019/179 Medisen Medical/179 Medisen Medical -Template/sass/_menu.scss */
 .main_menu .navbar-toggler {
   position: relative;
@@ -2323,7 +2330,7 @@ ul {
   /* line 2, ../../01 cl html template/New folder/May 2019/179 Medisen Medical/179 Medisen Medical -Template/sass/_banner.scss */
   .banner_part {
     background-image: none;
-    background-color: #f7f7f7;
+    /* background-color: #f7f7f7; */
     height: 800px;
   }
 }
