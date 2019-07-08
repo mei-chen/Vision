@@ -1,18 +1,13 @@
-image: docker:stable
-
-services:
-  - docker:dind
-
-variables:
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
-
-before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-
 build:
   stage: build
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker pull zihao/play:visn-app || true
     - docker build --cache-from zihao/play:visn-app -t zihao/play:visn-app -f deploy/app.dockerfile .
     - docker push zihao/play:visn-app
